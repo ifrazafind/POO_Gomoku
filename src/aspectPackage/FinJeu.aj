@@ -14,13 +14,13 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public aspect FinJeu {
-
-	public pointcut fin() : call(* *.gameOver(..));
 	
-	after(): fin(){
+	//public pointcut fin(Player p) : call(* *.gameOver(p));
+	public pointcut fin(Player p) : call(* *.gameOver(Player)) && args(p);
+	after(Player p): fin(p){
 		System.out.println("testfin");
 		//Dialog dialog = new Dialog(DialogType.);
-		Alert alert = new Alert(AlertType.CONFIRMATION, "message", ButtonType.YES);
+		Alert alert = new Alert(AlertType.NONE, "bingoooo! " + p.getName()+" wins", ButtonType.YES);
 		alert.showAndWait();
 
 		if (alert.getResult() == ButtonType.YES) {
