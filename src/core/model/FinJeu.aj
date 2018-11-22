@@ -1,11 +1,10 @@
-package aspectPackage;
+package core.model;
 
 import java.util.concurrent.TimeUnit;
 
 import core.BoardEventListener;
 import core.GridEventListener;
 import core.Player;
-import core.model.Spot;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -25,40 +24,46 @@ import java.util.ArrayList;
 import java.util.List;
 
 public aspect FinJeu {
-	
+
 	//public pointcut fin(Player p) : call(* *.gameOver(p));
-	//pointcut setScene(Stage s) : call(* *.start(Stage)) && args(s);
-	pointcut fin(Player p) : call(* *.notifyGameOver(Player)) && args(p);
-	pointcut isWon(int x,int y, int dx, int dy, Player p): args(x,y,dx,dy,p)&&call(* *.isWonBy(int,int,int,int,Player));
 	
+	//pointcut setGrid(Board b,Grid g) : target(b) && args(g) && execution(* *.board());
 	
+	pointcut fin(Grid g, Player p) : target(g) && call(* *.notifyGameOver(Player)) && args(p);
+	pointcut isWon(int x,int y, int dx, int dy, Player p,Grid g): target(g)&&args(x,y,dx,dy,p)&&execution(* *.isWonBy(int,int,int,int,Player));
 	
-	after(int x,int y, int dx, int dy, Player p) returning(boolean b): isWon(x,y,dx,dy,p){
+	/*after(Board b,Grid g): setGrid(b,g){
+		System.out.println("test");
+	}*/
+
+	
+	after(int x,int y, int dx, int dy, Player p, Grid g) returning(boolean b): isWon(x,y,dx,dy,p,g){
 		if(b==true) {
+			Player winner = new Player("winner", Color.BLUE);
 			System.out.println("parameters : "+x+"/"+y+"/"+dx+"/"+dy);
 			int a,c;
 			for(int i=0;i<5;i++) {
 				a=x+i*dx;
-				c=y+i*dy;
-				System.out.println("Colonne / Ligne : "+a+"/"+c);
-				//Board.this.getGraphicsContext2D();
-				//Board.getGraphicsContext2D();
-	            //Circle gc = new Circle();
-	            //gc.setFill(Color.BLUE);
-	            //double xx = 30 + a * 30; // center x
-	            //double yy = 30 + c * 30; // center y
-	            //double rr = 30 / 2; // radius
-	            //Circle gc =new Circle(xx, yy, rr, Color.BLUE);
-	            //gc.setFill(x - r, y - r, r * 2, r * 2);
-	            
-			}
-			System.out.println("test");	
+				c=y+i*dy;	
+				Spot s = g.getSpot(a, c);
+				//System.out.println(s.x+"/"+s.y);
+				//s.clear();
+				s.setOccupant(winner);
+			
+				//g.isOccupiedBy(a, c, winner);
+				
+				//Platform.
+				//System.out.println(s.getOccupant().getName());
+				System.out.println("Colonne / Ligne : "+a+"/"+c);	     
+				//g.placeStone(a, c, winner);
+			}	
+			
 		}
-		
-		
 	}
 	
-	after(Player p): fin(p){
+	
+	
+	after(Grid g, Player p): fin(g, p){
 		System.out.println("testfin");
 		//Dialog dialog = new Dialog(DialogType.);
 		Alert alertWinner = new Alert(AlertType.NONE, "bingoooo! " + p.getName()+" wins", ButtonType.OK);
