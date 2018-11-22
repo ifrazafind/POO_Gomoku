@@ -1,1 +1,4 @@
 # POO_Gomoku
+Guillaume CADAPEAUD
+Iry RAZAFINDRAHAINGO
+Mickaël REVILLON
