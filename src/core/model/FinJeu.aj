@@ -29,20 +29,19 @@ public aspect FinJeu {
 	
 	after(int x,int y, int dx, int dy, Player p, Grid g) returning(boolean b): isWon(x,y,dx,dy,p,g){
 		if(b==true) {
-			Player winner = new Player("winner", Color.BLUE);
 			System.out.println("parameters : "+x+"/"+y+"/"+dx+"/"+dy);
 			for(int i=0;i<5;i++) {
 				a[i] = x+i*dx;
 				c[i] = y+i*dy;	
-				Spot s = g.getSpot(a[i], c[i]);
 			}	
 			for(int i=0;i<5;i++) {
 				if (a[0] == a[1]) {
 					c[i] += 1;
 				}
 				else
-					a[i] += 1;
-				System.out.println("Colonne / Ligne : "+a[i]+"/"+c[i]);	
+					
+					a[4-i] += 1;
+				System.out.println("Colonne / Ligne : "+a[4-i]+"/"+c[i]);	
 			}
 			
 		}
