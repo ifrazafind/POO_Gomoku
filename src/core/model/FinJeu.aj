@@ -2,32 +2,22 @@ package core.model;
 
 import java.util.concurrent.TimeUnit;
 
-import core.BoardEventListener;
-import core.GridEventListener;
+
 import core.Player;
-import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.stage.Stage;
-import ui.Board;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public aspect FinJeu {
 
 	//public pointcut fin(Player p) : call(* *.gameOver(p));
 	
 	//pointcut setGrid(Board b,Grid g) : target(b) && args(g) && execution(* *.board());
+	int [] a = new int [5];
+	int [] c = new int [5];
 	
 	pointcut fin(Grid g, Player p) : target(g) && call(* *.notifyGameOver(Player)) && args(p);
 	pointcut isWon(int x,int y, int dx, int dy, Player p,Grid g): target(g)&&args(x,y,dx,dy,p)&&execution(* *.isWonBy(int,int,int,int,Player));
@@ -41,22 +31,19 @@ public aspect FinJeu {
 		if(b==true) {
 			Player winner = new Player("winner", Color.BLUE);
 			System.out.println("parameters : "+x+"/"+y+"/"+dx+"/"+dy);
-			int a,c;
 			for(int i=0;i<5;i++) {
-				a=x+i*dx;
-				c=y+i*dy;	
-				Spot s = g.getSpot(a, c);
-				//System.out.println(s.x+"/"+s.y);
-				//s.clear();
-				s.setOccupant(winner);
-			
-				//g.isOccupiedBy(a, c, winner);
-				
-				//Platform.
-				//System.out.println(s.getOccupant().getName());
-				System.out.println("Colonne / Ligne : "+a+"/"+c);	     
-				//g.placeStone(a, c, winner);
+				a[i] = x+i*dx;
+				c[i] = y+i*dy;	
+				Spot s = g.getSpot(a[i], c[i]);
 			}	
+			for(int i=0;i<5;i++) {
+				if (a[0] == a[1]) {
+					c[i] += 1;
+				}
+				else
+					a[i] += 1;
+				System.out.println("Colonne / Ligne : "+a[i]+"/"+c[i]);	
+			}
 			
 		}
 	}
@@ -66,9 +53,15 @@ public aspect FinJeu {
 	after(Grid g, Player p): fin(g, p){
 		System.out.println("testfin");
 		//Dialog dialog = new Dialog(DialogType.);
-		Alert alertWinner = new Alert(AlertType.NONE, "bingoooo! " + p.getName()+" wins", ButtonType.OK);
+		Alert alertWinner = new Alert(AlertType.NONE, "bingoooo! " + p.getName()+" wins"+ "\n" + 
+				"\n Appuyer sur \"OK\" pour voir la sequence gagnante", ButtonType.OK);
+		Player winner = new Player("winner", Color.BLUE);
+		Player lastpoint = new Player("last", Color.BLUE);
 		alertWinner.showAndWait();
-
+		for(int i=0;i<4;i++) {
+		g.placeStone(a[i],c[i] , winner);
+		}
+		g.placeStone(a[4], c[4], lastpoint);
 		if (alertWinner.getResult() == ButtonType.OK) {
 			try {
 				TimeUnit.SECONDS.sleep(1);
